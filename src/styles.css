@@ -38,3 +38,6 @@ h2 { margin-top: 24px; font-size: 18px; }
 .overlay { position: fixed; inset: 0; background: #0008; display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
 .quick { max-width: 480px; width: 100%; max-height: 90vh; overflow: auto; }
 .quick select, .quick textarea { width: 100%; }
+.picker { display: flex; flex-direction: column; gap: 6px; }
+.picker-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.picker-list button { width: 100%; text-align: start; margin-top: 0; font-size: 14px; padding: 8px; }

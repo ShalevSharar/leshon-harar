@@ -1,32 +1,27 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import SchoolPicker, { PickedSchool } from '../../components/SchoolPicker';
 
 type Lecture = {
   id: string; lecture_date: string | null; grade: string; est_students: number | null;
   status: string; notes: string; survey_token: string; school_id: string;
   schools: { name: string; city: string } | null;
 };
-type SchoolOption = { id: string; name: string; city: string };
-
 const STATUS_LABELS: Record<string, string> = { planned: 'מתוכננת', done: 'התקיימה', cancelled: 'בוטלה' };
 
 // הרצאות: רשימה, תזמון חדש, סימון סטטוס והעתקת קישור לסקר.
 export default function Lectures() {
   const [rows, setRows] = useState<Lecture[]>([]);
-  const [schools, setSchools] = useState<SchoolOption[]>([]);
+  const [school, setSchool] = useState<PickedSchool | null>(null);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState('');
 
   const load = useCallback(async () => {
     if (!supabase) return;
-    const [l, s] = await Promise.all([
-      supabase.from('lectures').select('*, schools(name,city)').order('lecture_date', { ascending: false }),
-      supabase.from('schools').select('id,name,city').order('name').limit(500),
-    ]);
+    const l = await supabase.from('lectures').select('*, schools(name,city)').order('lecture_date', { ascending: false });
     if (l.error) return setError('טעינת ההרצאות נכשלה.');
     setRows((l.data ?? []) as unknown as Lecture[]);
-    setSchools((s.data ?? []) as SchoolOption[]);
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -35,7 +30,7 @@ export default function Lectures() {
     e.preventDefault();
     if (!supabase) return;
     const f = new FormData(e.currentTarget);
-    const schoolId = String(f.get('school_id') ?? '');
+    const schoolId = school?.id ?? '';
     if (!schoolId) return setError('יש לבחור בית ספר.');
     const est = String(f.get('est_students') ?? '').trim();
     const { error: err } = await supabase.from('lectures').insert({
@@ -48,6 +43,7 @@ export default function Lectures() {
     // עדכון שלב בית הספר להרצאה שנקבעה
     await supabase.from('schools').update({ stage: 'lecture_scheduled' }).eq('id', schoolId);
     e.currentTarget.reset();
+    setSchool(null);
     setError('');
     load();
   }
@@ -79,10 +75,7 @@ export default function Lectures() {
       <form onSubmit={addLecture} className="card" style={{ background: 'transparent', padding: 0, marginBottom: 16 }}>
         <h2>הרצאה חדשה</h2>
         <div className="toolbar">
-          <select name="school_id" required aria-label="בית ספר">
-            <option value="">בחרו בית ספר</option>
-            {schools.map((s) => <option key={s.id} value={s.id}>{s.name} ({s.city})</option>)}
-          </select>
+          <SchoolPicker value={school} onChange={setSchool} />
           <input name="lecture_date" type="date" aria-label="תאריך" />
           <input name="grade" placeholder="שכבה" />
           <input name="est_students" type="number" min={0} placeholder="מספר תלמידים" />

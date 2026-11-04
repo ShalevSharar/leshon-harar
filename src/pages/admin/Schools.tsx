@@ -96,12 +96,12 @@ export default function Schools() {
               {rows.map((s) => (
                 <tr key={s.id}>
                   <td><Link to={`/admin/schools/${s.id}`}>{s.name}</Link>{s.is_sample && <span className="tag"> דוגמה</span>}</td>
-                  <td>{s.city}</td>
-                  <td><a href={`tel:${s.phone}`}>{s.phone}</a></td>
-                  <td>{s.level}</td>
-                  <td>{STAGE_LABELS[s.stage] ?? s.stage}</td>
-                  <td>{s.next_followup_at ?? ''}</td>
-                  <td><button type="button" className="secondary" onClick={() => setQuick(s)}>תצוגה מהירה</button></td>
+                  <td data-label="עיר">{s.city}</td>
+                  <td data-label="טלפון"><a href={`tel:${s.phone}`}>{s.phone}</a></td>
+                  <td data-label="רמה">{s.level}</td>
+                  <td data-label="שלב"><span className={`stage s-${s.stage}`}>{STAGE_LABELS[s.stage] ?? s.stage}</span></td>
+                  <td data-label="מעקב">{s.next_followup_at ?? ''}</td>
+                  <td><button type="button" className="secondary" onClick={() => setQuick(s)}>עדכון פנייה</button></td>
                 </tr>
               ))}
               {!rows.length && <tr><td colSpan={7}>אין בתי ספר להצגה.</td></tr>}

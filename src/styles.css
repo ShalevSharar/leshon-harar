@@ -28,3 +28,13 @@ td select { width: auto; margin-top: 0; font-size: 14px; padding: 6px; }
 .navlink { padding: 10px 14px; border-radius: 8px; text-decoration: none; color: var(--accent); border: 1px solid var(--accent); }
 .navlink.active { background: var(--accent); color: #fff; }
 h2 { margin-top: 24px; font-size: 18px; }
+.letters { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.chip { width: auto; margin-top: 0; padding: 6px 10px; font-size: 14px; background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 16px; }
+.chip.on { background: var(--accent); color: #fff; }
+.stages { border: 0; padding: 0; margin: 8px 0; display: flex; flex-wrap: wrap; gap: 12px; }
+.stages legend { font-weight: 600; width: 100%; }
+.checkline { display: inline-flex; align-items: center; gap: 4px; margin-top: 0; font-weight: normal; }
+.checkline input { width: auto; margin: 0; }
+.overlay { position: fixed; inset: 0; background: #0008; display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+.quick { max-width: 480px; width: 100%; max-height: 90vh; overflow: auto; }
+.quick select, .quick textarea { width: 100%; }

@@ -11,6 +11,8 @@ export const STAGE_LABELS: Record<string, string> = {
 
 export const STAGES = Object.keys(STAGE_LABELS);
 
+export const CHANNELS = ['טלפון', 'מייל', 'ווטסאפ', 'דף נחיתה', 'אחר'];
+
 export const REQUEST_STATUS_LABELS: Record<string, string> = {
   pending: 'ממתין',
   matched: 'שויך לבית ספר',

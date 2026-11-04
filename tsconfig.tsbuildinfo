@@ -1,0 +1,1 @@
+{"root":["./src/main.tsx","./src/vite-env.d.ts","./src/config/settings.ts","./src/lib/supabase.ts","./src/pages/volunteerform.tsx","./src/pages/volunteerqr.tsx"],"version":"5.9.3"}

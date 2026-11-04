@@ -75,7 +75,7 @@ export default function Dashboard() {
       </div>
 
       <div className="card" style={{ marginTop: 16 }}>
-        <h2>לטפל היום (מעקבים שהגיע זמנם)</h2>
+        <h2 className="important">לטפל היום (מעקבים שהגיע זמנם)</h2>
         {due.length ? (
           <ul>
             {due.map((d) => (

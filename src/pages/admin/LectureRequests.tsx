@@ -51,7 +51,7 @@ export default function LectureRequests() {
                   <td>{r.grades}</td>
                   <td>{r.preferred_dates}</td>
                   <td>{r.notes}</td>
-                  <td>{REQUEST_STATUS_LABELS[r.match_status] ?? r.match_status}</td>
+                  <td className={r.match_status === 'review' ? 'important' : undefined}>{REQUEST_STATUS_LABELS[r.match_status] ?? r.match_status}</td>
                 </tr>
               ))}
               {!rows.length && <tr><td colSpan={10}>אין בקשות עדיין.</td></tr>}

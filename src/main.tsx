@@ -13,6 +13,9 @@ import SchoolCard from './pages/admin/SchoolCard';
 import LectureRequests from './pages/admin/LectureRequests';
 import Volunteers from './pages/admin/Volunteers';
 import './styles.css';
+import { initTheme } from './lib/theme';
+
+initTheme();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

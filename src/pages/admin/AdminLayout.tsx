@@ -1,5 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import ThemeToggle from '../../components/ThemeToggle';
 
 const ITEMS = [
   { to: '/admin/dashboard', label: 'דשבורד', icon: '◉' },
@@ -22,7 +23,10 @@ export default function AdminLayout() {
             </NavLink>
           ))}
         </nav>
-        <button type="button" className="secondary logout" onClick={() => supabase?.auth.signOut()}>יציאה</button>
+        <div className="logout">
+          <ThemeToggle />
+          <button type="button" className="secondary" onClick={() => supabase?.auth.signOut()}>יציאה</button>
+        </div>
       </aside>
 
       <main className="main">

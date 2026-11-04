@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { VOLUNTEER_AREAS, VOLUNTEER_CONSENT_TEXT, VOLUNTEER_SOURCES } from '../config/settings';
+import ThemeToggle from '../components/ThemeToggle';
 
 const SOURCE_VALUES: string[] = VOLUNTEER_SOURCES.map((s) => s.value);
 
@@ -53,6 +54,7 @@ export default function VolunteerForm() {
 
   return (
     <div className="page">
+      <div style={{ textAlign: 'end' }}><ThemeToggle /></div>
       <form className="card" onSubmit={onSubmit}>
         <h1>להתנדב עם "לשון הרע לא מדבר אליי"</h1>
         <label>שם מלא<input name="full_name" required minLength={2} autoComplete="name" /></label>

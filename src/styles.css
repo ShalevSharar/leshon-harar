@@ -14,3 +14,13 @@ button { margin-top: 20px; width: 100%; padding: 14px; font-size: 18px; border: 
 button:disabled { opacity: .6; }
 .err { color: var(--err); margin-top: 12px; }
 .hidden { position: absolute; left: -9999px; }
+.page.wide { max-width: 1100px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 12px 0; }
+.toolbar select { width: auto; margin-top: 0; }
+.toolbar button { width: auto; margin-top: 0; font-size: 15px; padding: 10px 14px; }
+button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: start; padding: 8px; border-bottom: 1px solid #8884; white-space: nowrap; }
+td select { width: auto; margin-top: 0; font-size: 14px; padding: 6px; }
+.tag { font-size: 12px; color: var(--accent); }

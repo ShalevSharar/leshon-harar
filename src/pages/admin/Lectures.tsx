@@ -1,5 +1,6 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import QRCode from 'qrcode';
 import { supabase } from '../../lib/supabase';
 import SchoolPicker, { PickedSchool } from '../../components/SchoolPicker';
 
@@ -16,6 +17,13 @@ export default function Lectures() {
   const [school, setSchool] = useState<PickedSchool | null>(null);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState('');
+  const [qrFor, setQrFor] = useState<string | null>(null);
+  const [qrImg, setQrImg] = useState('');
+
+  useEffect(() => {
+    if (!qrFor) return setQrImg('');
+    QRCode.toDataURL(`${window.location.origin}/survey/${qrFor}`, { width: 260, margin: 1 }).then(setQrImg);
+  }, [qrFor]);
 
   const load = useCallback(async () => {
     if (!supabase) return;
@@ -83,6 +91,15 @@ export default function Lectures() {
         </div>
       </form>
 
+      {qrFor && qrImg && (
+        <div className="card qr-card" style={{ marginBottom: 16, textAlign: 'center' }}>
+          <p><strong>סריקה לסקר</strong> (להדפסה או להקרנה לפני סוף ההרצאה)</p>
+          <img src={qrImg} alt="QR לסקר ההרצאה" width={260} height={260} />
+          <p className="muted">{`${window.location.origin}/survey/${qrFor}`}</p>
+          <button type="button" className="secondary" onClick={() => window.print()}>הדפסה</button>
+        </div>
+      )}
+
       <div className="table-wrap">
         <table>
           <thead>
@@ -101,9 +118,15 @@ export default function Lectures() {
                   </select>
                 </td>
                 <td>
-                  <button type="button" className="secondary" onClick={() => copySurvey(l.survey_token)}>
-                    {copied === l.survey_token ? 'הקישור הועתק' : 'העתק קישור לסקר'}
-                  </button>
+                  <div className="toolbar">
+                    <button type="button" className="secondary" onClick={() => copySurvey(l.survey_token)}>
+                      {copied === l.survey_token ? 'הקישור הועתק' : 'העתק קישור'}
+                    </button>
+                    <button type="button" className="secondary" onClick={() => setQrFor(qrFor === l.survey_token ? null : l.survey_token)}>
+                      QR לסקר
+                    </button>
+                    <Link to={`/admin/lectures/${l.id}`}>תוצאות</Link>
+                  </div>
                 </td>
               </tr>
             ))}

@@ -127,3 +127,14 @@ td select { width: auto; margin-top: 0; font-size: 14px; padding: 6px; }
   td[data-label]::before { content: attr(data-label) ': '; color: var(--muted); font-size: 13px; }
   td:first-child { font-weight: 600; font-size: 16px; }
 }
+.choice-row { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
+button.big { padding: 18px; font-size: 18px; margin-top: 0; }
+.question { margin: 18px 0; }
+.scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
+.scale-btn { margin-top: 0; padding: 14px 0; font-size: 18px; background: var(--card); color: var(--fg); border: 1px solid var(--line); }
+.scale-btn.on { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.bar-row { display: grid; grid-template-columns: 1fr 1fr 60px; gap: 10px; align-items: center; margin: 10px 0; }
+.bar { background: var(--accent-soft); border-radius: 999px; height: 10px; overflow: hidden; }
+.bar-fill { background: var(--accent); height: 100%; }
+.open-block { margin: 12px 0; }
+@media (max-width: 820px) { .bar-row { grid-template-columns: 1fr; } }

@@ -21,13 +21,13 @@ const GROUPS: { title: string; items: { to: string; label: string; icon: string 
       { to: '/admin/calendar', label: 'לוח שנה', icon: '▤' },
       { to: '/admin/lectures', label: 'הרצאות', icon: '✎' },
       { to: '/admin/lecture-settings', label: 'מרצים', icon: '☰' },
+      { to: '/admin/surveys', label: 'דוחות ונתונים', icon: '★' },
     ],
   },
   {
-    title: 'אנשים ונתונים',
+    title: 'אנשים',
     items: [
       { to: '/admin/volunteers', label: 'מתנדבים', icon: '♥' },
-      { to: '/admin/surveys', label: 'דוחות ונתונים', icon: '★' },
     ],
   },
   {

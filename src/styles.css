@@ -339,7 +339,7 @@ input[type="color"].color-dot::-moz-color-swatch { border: none; border-radius: 
 
 /* ===== סגול בהיר במקום התכלת, ומסגרות מסודרות לתיבות ===== */
 :root {
-  --bg: #f4f1fb;              /* לבנדר-סגלגל בהיר מאוד */
+  --bg: #eef8f1;              /* לבנדר-סגלגל בהיר מאוד */
   --sky: #e9e2f9;             /* סגול בהיר */
   --lavender: #e6dcf8;        /* סגול בהיר יותר */
   --line: #e4ddf2;            /* מסגרת סגלגלה עדינה */

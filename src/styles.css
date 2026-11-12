@@ -336,3 +336,16 @@ input[type="color"].color-dot {
 input[type="color"].color-dot::-webkit-color-swatch-wrapper { padding: 0; }
 input[type="color"].color-dot::-webkit-color-swatch { border: none; border-radius: 50%; }
 input[type="color"].color-dot::-moz-color-swatch { border: none; border-radius: 50%; }
+
+/* ===== סגול בהיר במקום התכלת, ומסגרות מסודרות לתיבות ===== */
+:root {
+  --bg: #f4f1fb;              /* לבנדר-סגלגל בהיר מאוד */
+  --sky: #e9e2f9;             /* סגול בהיר */
+  --lavender: #e6dcf8;        /* סגול בהיר יותר */
+  --line: #e4ddf2;            /* מסגרת סגלגלה עדינה */
+}
+.card, .kpi-card, .q-card, .quotes li, ul.plain li, .ranked, .stacked-row, .question-legend li {
+  border: 1px solid var(--line);
+}
+.card { box-shadow: 0 2px 10px rgba(92, 62, 160, .06); }
+.kpi-card { border-radius: 16px; }

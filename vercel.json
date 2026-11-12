@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/cal/([0-9a-fA-F-]{36})\\.ics", "destination": "/api/calendar?token=$1" },
+    { "source": "/((?!api/|cal/).*)", "destination": "/index.html" }
+  ]
 }

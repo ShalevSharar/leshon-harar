@@ -5,7 +5,9 @@ import ThemeToggle from '../../components/ThemeToggle';
 const ITEMS = [
   { to: '/admin/dashboard', label: 'דשבורד', icon: '◉' },
   { to: '/admin/schools', label: 'בתי ספר', icon: '▦' },
+  { to: '/admin/calendar', label: 'לוח שנה', icon: '▤' },
   { to: '/admin/lectures', label: 'הרצאות', icon: '✎' },
+  { to: '/admin/lecture-settings', label: 'מרצים', icon: '☰' },
   { to: '/admin/requests', label: 'בקשות', icon: '✉' },
   { to: '/admin/volunteers', label: 'מתנדבים', icon: '♥' },
 ];

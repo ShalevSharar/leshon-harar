@@ -4,9 +4,9 @@ import { supabase, NO_DB_MESSAGE } from '../../lib/supabase';
 // כניסה עם Google מוסתרת עד שההגדרה בסופאבייס תסתיים. להפוך ל-true כשהיא מוכנה.
 const GOOGLE_ENABLED = false;
 
-// כניסה והרשמה עם מייל וסיסמה. הרשמה מותרת רק למיילים ברשימה המאושרת (ראו 0010).
+// כניסה, הרשמה ושחזור סיסמה עם מייל. הרשמה מותרת רק למיילים ברשימה המאושרת (ראו 0010).
 export default function Login() {
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [mode, setMode] = useState<'login' | 'signup' | 'forgot'>('login');
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   const [busy, setBusy] = useState(false);
@@ -21,6 +21,14 @@ export default function Login() {
     const password = String(f.get('password') ?? '');
     setBusy(true);
 
+    if (mode === 'forgot') {
+      // תמיד אותה הודעה, כדי לא לחשוף אילו מיילים קיימים במערכת
+      await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/admin` });
+      setBusy(false);
+      setInfo('אם המייל רשום במערכת, נשלח אליו קישור לאיפוס סיסמה. בדקו גם בתיקיית הספאם.');
+      return;
+    }
+
     if (mode === 'login') {
       const { error: err } = await supabase.auth.signInWithPassword({ email, password });
       setBusy(false);
@@ -33,11 +41,9 @@ export default function Login() {
     setBusy(false);
     if (err) return setError('ההרשמה נכשלה. ודאו שהמייל מאושר במערכת, ושהסיסמה לפחות 6 תווים.');
     if (!data.session) {
-      // אם סופאבייס דורש אישור מייל, החשבון ייפתח אחרי לחיצה על הקישור במייל
       setInfo('נשלח מייל אישור. לחצו על הקישור ואז התחברו.');
       setMode('login');
     }
-    // אם יש session, AdminGate ייכנס למערכת אוטומטית
   }
 
   // כניסה עם Google. בפעם הראשונה החשבון נוצר אוטומטית, אבל רק למיילים ברשימה המאושרת.
@@ -52,12 +58,13 @@ export default function Login() {
   }
 
   const isSignup = mode === 'signup';
+  const isForgot = mode === 'forgot';
 
   return (
     <div className="page">
       <form className="card" onSubmit={onSubmit}>
-        <h1>{isSignup ? 'הרשמה למערכת' : 'כניסה למערכת'}</h1>
-        {GOOGLE_ENABLED && (
+        <h1>{isForgot ? 'איפוס סיסמה' : isSignup ? 'הרשמה למערכת' : 'כניסה למערכת'}</h1>
+        {GOOGLE_ENABLED && mode === 'login' && (
           <>
             <button type="button" className="secondary" onClick={signInWithGoogle} style={{ width: '100%' }}>
               כניסה עם Google
@@ -66,27 +73,34 @@ export default function Login() {
           </>
         )}
         <label>מייל<input name="email" type="email" required autoComplete="username" /></label>
-        <label>
-          סיסמה
-          <input
-            name="password"
-            type="password"
-            required
-            minLength={isSignup ? 6 : undefined}
-            autoComplete={isSignup ? 'new-password' : 'current-password'}
-          />
-        </label>
+        {!isForgot && (
+          <label>
+            סיסמה
+            <input
+              name="password"
+              type="password"
+              required
+              minLength={isSignup ? 6 : undefined}
+              autoComplete={isSignup ? 'new-password' : 'current-password'}
+            />
+          </label>
+        )}
         {error && <p className="err" role="alert">{error}</p>}
         {info && <p className="ok" role="status">{info}</p>}
         <button type="submit" disabled={busy}>
-          {busy ? 'רגע...' : isSignup ? 'הרשמה' : 'כניסה'}
+          {busy ? 'רגע...' : isForgot ? 'שליחת קישור לאיפוס' : isSignup ? 'הרשמה' : 'כניסה'}
         </button>
+        {mode === 'login' && (
+          <button type="button" className="ghost" onClick={() => { setMode('forgot'); setError(''); setInfo(''); }}>
+            שכחתי סיסמה
+          </button>
+        )}
         <button
           type="button"
           className="ghost"
-          onClick={() => { setMode(isSignup ? 'login' : 'signup'); setError(''); setInfo(''); }}
+          onClick={() => { setMode(isSignup || isForgot ? 'login' : 'signup'); setError(''); setInfo(''); }}
         >
-          {isSignup ? 'יש לי כבר חשבון, כניסה' : 'אין לי חשבון, הרשמה'}
+          {isSignup || isForgot ? 'חזרה לכניסה' : 'אין לי חשבון, הרשמה'}
         </button>
       </form>
     </div>

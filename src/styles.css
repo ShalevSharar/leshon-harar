@@ -316,3 +316,23 @@ table.pretty .nowrap { white-space: nowrap; }
 .avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); flex-shrink: 0; }
 .avatar-empty { display: inline-flex; align-items: center; justify-content: center; background: var(--lavender); color: var(--fg); font-weight: 700; font-size: 18px; }
 .photo-btn { margin-top: 0; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+
+/* ===== בורר צבע עגול: כל העיגול בצבע הנבחר ================ */
+input[type="color"].color-dot {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  margin: 0;
+  border: 2px solid var(--card);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--line);
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+input[type="color"].color-dot::-webkit-color-swatch-wrapper { padding: 0; }
+input[type="color"].color-dot::-webkit-color-swatch { border: none; border-radius: 50%; }
+input[type="color"].color-dot::-moz-color-swatch { border: none; border-radius: 50%; }

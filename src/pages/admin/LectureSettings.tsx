@@ -154,7 +154,7 @@ function ItemList({ table, title, addLabel, withContacts = false, withDuration =
       {showNew && (
         <form onSubmit={add} className="toolbar">
           <input name="name" placeholder="שם" required minLength={2} aria-label="שם" />
-          <input name="color" type="color" defaultValue="#4a4a4a" aria-label="צבע" style={{ width: 56 }} />
+          <input name="color" type="color" className="color-dot" defaultValue="#4a4a4a" aria-label="צבע" />
           {withContacts && <input name="phone" type="tel" placeholder="טלפון" aria-label="טלפון" />}
           {withContacts && <input name="email" type="email" placeholder="מייל" aria-label="מייל" />}
           {withDuration && (
@@ -212,7 +212,7 @@ function ItemList({ table, title, addLabel, withContacts = false, withDuration =
                     type="color"
                     value={r.color}
                     aria-label={`צבע של ${r.name}`}
-                    style={{ width: 48, padding: 2 }}
+                    className="color-dot"
                     onChange={(e) => update(r.id, { color: e.target.value })}
                   />
                 </td>

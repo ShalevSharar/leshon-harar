@@ -1,6 +1,6 @@
 // פונקציית Vercel: מחזירה את היומן של מרצה כקובץ .ics לפי טוקן.
 // נקראת דרך /cal/<token>.ics (ראו vercel.json). משתמשת רק במפתח anon, ללא service_role.
-import { buildIcs, type FeedPayload } from './_ics';
+import { buildIcs, type FeedPayload } from './_ics.js';
 
 declare const process: { env: Record<string, string | undefined> };
 

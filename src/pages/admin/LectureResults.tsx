@@ -28,17 +28,15 @@ export default function LectureResults() {
       } else {
         const schoolName = (lec.data as unknown as { schools?: { name?: string } } | null)?.schools?.name ?? '';
         setTitle(`${schoolName}${lec.data?.lecture_date ? ` · ${lec.data.lecture_date}` : ''}`);
-        setQuestions((qs.data ?? []) as Question[]);
-        setResponses((rs.data ?? []) as Response[]);
+        // הסקר לתלמידים בלבד: שאלות ותשובות של מורים לא מוצגות
+        setQuestions(((qs.data ?? []) as Question[]).filter((q) => q.audience === 'student'));
+        setResponses(((rs.data ?? []) as Response[]).filter((r) => r.audience === 'student'));
       }
       setLoading(false);
     })();
   }, [id]);
 
-  const counts = {
-    student: responses.filter((r) => r.audience === 'student').length,
-    teacher: responses.filter((r) => r.audience === 'teacher').length,
-  };
+  const counts = { student: responses.length };
 
   function average(q: Question): number | null {
     const vals = responses
@@ -64,7 +62,7 @@ export default function LectureResults() {
       {error && <p className="err" role="alert">{error}</p>}
 
       <p>
-        משיבים: תלמידים <strong>{counts.student}</strong> · מורים <strong>{counts.teacher}</strong>
+        משיבים: תלמידים <strong>{counts.student}</strong>
       </p>
 
       {weakest.length > 0 && (

@@ -10,18 +10,14 @@ type SurveyData = {
   questions: Question[];
 };
 
-const AUDIENCES = [
-  { value: 'student', label: 'אני תלמיד/ה' },
-  { value: 'teacher', label: 'אני מורה' },
-] as const;
-
 // דף סקר ציבורי: בלי התחברות. תלמידים אנונימיים לגמרי: אין זיהוי, ואין שמירה של מזהה.
 export default function Survey() {
   const { token } = useParams();
   const [data, setData] = useState<SurveyData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [audience, setAudience] = useState<'student' | 'teacher' | ''>('');
+  // הסקר לתלמידים בלבד: אין בחירה של מורה או תלמיד
+  const audience = 'student' as const;
   const [answers, setAnswers] = useState<Record<string, number | string>>({});
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
@@ -96,7 +92,7 @@ export default function Survey() {
     );
   }
 
-  const mine = audience ? data.questions.filter((q) => q.audience === audience) : [];
+  const mine = data.questions.filter((q) => q.audience === 'student');
 
   return (
     <div className="page">
@@ -104,20 +100,7 @@ export default function Survey() {
         <h1>סקר אחרי ההרצאה</h1>
         <p className="muted">{data.school_name}{data.grade && ` · ${data.grade}`}</p>
 
-        {!audience && (
-          <>
-            <p><strong>מי אתם?</strong></p>
-            <div className="choice-row">
-              {AUDIENCES.map((a) => (
-                <button key={a.value} type="button" className="secondary big" onClick={() => setAudience(a.value)}>
-                  {a.label}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-
-        {audience && (
+        {(
           <>
             {mine.map((q) => (
               <div key={q.id} className="question">
@@ -151,7 +134,6 @@ export default function Survey() {
             <input className="hidden" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
             {error && <p className="err" role="alert">{error}</p>}
             <button type="submit" disabled={busy}>{busy ? 'שולח...' : 'שליחה'}</button>
-            <button type="button" className="ghost" onClick={() => setAudience('')}>חזרה</button>
           </>
         )}
       </form>

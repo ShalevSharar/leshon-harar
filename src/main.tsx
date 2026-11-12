@@ -17,6 +17,7 @@ import Volunteers from './pages/admin/Volunteers';
 import Calendar from './pages/admin/Calendar';
 import LectureSettings from './pages/admin/LectureSettings';
 import AdminUsers from './pages/admin/AdminUsers';
+import SurveySummary from './pages/admin/SurveySummary';
 import './styles.css';
 import { initTheme } from './lib/theme';
 
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="calendar" element={<Calendar />} />
           <Route path="lecture-settings" element={<LectureSettings />} />
           <Route path="users" element={<AdminUsers />} />
+          <Route path="surveys" element={<SurveySummary />} />
           <Route path="lectures" element={<Lectures />} />
           <Route path="lectures/:id" element={<LectureResults />} />
           <Route path="schools" element={<Schools />} />

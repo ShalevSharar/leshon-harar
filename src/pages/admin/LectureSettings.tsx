@@ -46,7 +46,7 @@ function ItemList({ table, title, addLabel, withContacts = false, withDuration =
   const load = useCallback(async () => {
     if (!supabase) return setError(NO_DB_MESSAGE);
     const fields = ['id', 'name', 'color', 'active'];
-    if (withContacts) fields.push('phone', 'email', 'calendar_token');
+    if (withContacts) fields.push('phone', 'email', 'calendar_token', 'photo_data');
     if (withDuration) fields.push('default_minutes');
     const { data, error: err } = await supabase.from(table).select(fields.join(',')).order('name');
     if (err) return setError('טעינת הרשימה נכשלה.');
@@ -168,7 +168,7 @@ function ItemList({ table, title, addLabel, withContacts = false, withDuration =
         <table>
           <thead>
             <tr>
-              <th>שם</th>
+              <th>שם</th>{withContacts && <th>תמונה</th>}
               <th>צבע</th>
               {withContacts && <th>טלפון</th>}
               {withContacts && <th>מייל</th>}
@@ -181,7 +181,32 @@ function ItemList({ table, title, addLabel, withContacts = false, withDuration =
           <tbody>
             {rows.map((r) => (
               <tr key={r.id}>
-                <td>{r.name}</td>
+                {withContacts && (
+                  <td>
+                    <PhotoCell
+                      name={r.name}
+                      photo={(r as Item & { photo_data?: string | null }).photo_data ?? null}
+                      onChange={(data) => update(r.id, { photo_data: data } as Partial<Item>)}
+                    />
+                  </td>
+                )}
+                <td>
+                  <input
+                    defaultValue={r.name}
+                    key={`${r.id}-${r.name}`}
+                    aria-label={`שם של ${r.name}`}
+                    style={{ minWidth: 160 }}
+                    onBlur={(e) => {
+                      const v = e.target.value.trim();
+                      if (v && v !== r.name) {
+                        if (v.length < 2) return setError('השם חייב להכיל לפחות 2 תווים.');
+                        update(r.id, { name: v });
+                      } else {
+                        e.target.value = r.name;
+                      }
+                    }}
+                  />
+                </td>
                 <td>
                   <input
                     type="color"
@@ -271,6 +296,74 @@ function ItemList({ table, title, addLabel, withContacts = false, withDuration =
       </div>
     </section>
   );
+}
+
+// תמונה למרצה: בחירת קובץ, הקטנה ל-256px בדפדפן, ושמירה כ-JPEG קטן
+function PhotoCell({ name, photo, onChange }: {
+  name: string;
+  photo: string | null;
+  onChange: (data: string | null) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState('');
+
+  async function pick(file: File) {
+    setErr('');
+    if (!file.type.startsWith('image/')) return setErr('יש לבחור קובץ תמונה.');
+    setBusy(true);
+    try {
+      const data = await shrinkImage(file, 256);
+      if (data.length > 150000) return setErr('התמונה גדולה מדי גם אחרי הקטנה. נסו תמונה אחרת.');
+      onChange(data);
+    } catch {
+      setErr('לא ניתן לקרוא את התמונה.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="photo-cell">
+      {photo
+        ? <img src={photo} alt={`תמונה של ${name}`} className="avatar" />
+        : <span className="avatar avatar-empty" aria-hidden="true">{name.slice(0, 1)}</span>}
+      <label className="btn-soft photo-btn">
+        {busy ? 'מעלה...' : photo ? 'החלפה' : 'העלאה'}
+        <input
+          type="file"
+          accept="image/*"
+          hidden
+          disabled={busy}
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) pick(f); e.target.value = ''; }}
+        />
+      </label>
+      {photo && <button type="button" className="ghost" onClick={() => onChange(null)}>הסרה</button>}
+      {err && <span className="err small">{err}</span>}
+    </div>
+  );
+}
+
+// הקטנת תמונה לריבוע בגודל size, ומחזיר data URL של JPEG
+function shrinkImage(file: File, size: number): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const side = Math.min(img.width, img.height);
+      const sx = (img.width - side) / 2;
+      const sy = (img.height - side) / 2;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return reject(new Error('no canvas'));
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('bad image')); };
+    img.src = url;
+  });
 }
 
 // ערך משך מהשדה: ריק -> null, מספר בטווח -> המספר, אחרת -> 'invalid'

@@ -27,6 +27,7 @@ export default function SchoolCard() {
   const [lectures, setLectures] = useState<Lec[]>([]);
   const [assignees, setAssignees] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const [editing, setEditing] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
   const load = useCallback(async () => {
@@ -58,6 +59,31 @@ export default function SchoolCard() {
     const { error: err } = await supabase.from('schools').update({ stage: next }).eq('id', school.id);
     if (err) return setError('עדכון השלב נכשל.');
     setSchool({ ...school, stage: next });
+  }
+
+  // עריכת פרטי המוסד (שם, סוג, עיר, טלפון וכו'). שומרים רק שדות שהשתנו.
+  async function saveDetails(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!supabase || !school) return;
+    const form = e.currentTarget;
+    const f = new FormData(form);
+    const name = String(f.get('name') ?? '').trim();
+    if (name.length < 2) return setError('שם המוסד חייב להכיל לפחות 2 תווים.');
+    const patch = {
+      name,
+      org_type: String(f.get('org_type') ?? school.org_type),
+      level: String(f.get('level') ?? ''),
+      sector: String(f.get('sector') ?? '').trim(),
+      district: String(f.get('district') ?? '').trim(),
+      city: String(f.get('city') ?? '').trim(),
+      phone: String(f.get('phone') ?? '').trim(),
+      address: String(f.get('address') ?? '').trim(),
+    };
+    const { error: err } = await supabase.from('schools').update(patch).eq('id', school.id);
+    if (err) return setError('שמירת הפרטים נכשלה.');
+    setEditing(false);
+    setError('');
+    load();
   }
 
   async function changeAssignee(email: string) {
@@ -143,7 +169,35 @@ export default function SchoolCard() {
   return (
     <div className="card">
       <p><Link to="/admin/schools">← חזרה לרשימה</Link></p>
-      <h1>{school.name}</h1>
+      <div className="toolbar" style={{ justifyContent: 'space-between' }}>
+        <h1 style={{ margin: 0 }}>{school.name}</h1>
+        <button type="button" className="secondary" onClick={() => setEditing((v) => !v)}>
+          {editing ? 'ביטול' : 'עריכת פרטים'}
+        </button>
+      </div>
+      {editing && (
+        <form onSubmit={saveDetails} className="card" style={{ margin: '12px 0' }}>
+          <div className="checks">
+            <label>שם המוסד<input name="name" defaultValue={school.name} required minLength={2} /></label>
+            <label>סוג מוסד
+              <select name="org_type" defaultValue={school.org_type}>
+                {['בית ספר', 'מתנסים', 'חברתון', 'ארגון אחר'].map((t) => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </label>
+            <label>רמה
+              <select name="level" defaultValue={school.level}>
+                {['', 'יסודי', 'חטיבה', 'תיכון', 'פנימייה', 'אחר'].map((t) => <option key={t} value={t}>{t || 'לא צוין'}</option>)}
+              </select>
+            </label>
+            <label>מגזר<input name="sector" defaultValue={school.sector} /></label>
+            <label>מחוז<input name="district" defaultValue={school.district} /></label>
+            <label>עיר<input name="city" defaultValue={school.city} /></label>
+            <label>טלפון<input name="phone" type="tel" defaultValue={school.phone} /></label>
+            <label>כתובת<input name="address" defaultValue={school.address} /></label>
+          </div>
+          <button type="submit">שמירת פרטים</button>
+        </form>
+      )}
       <p className="muted">
         {[school.org_type, school.city, school.district, school.level, school.sector].filter(Boolean).join(' · ')}
       </p>

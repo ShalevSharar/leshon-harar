@@ -310,3 +310,9 @@ table.pretty .nowrap { white-space: nowrap; }
   .card, .report-section { break-inside: avoid; box-shadow: none; }
   body { background: #fff; }
 }
+
+/* ===== תמונת מרצה ===== */
+.photo-cell { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); flex-shrink: 0; }
+.avatar-empty { display: inline-flex; align-items: center; justify-content: center; background: var(--lavender); color: var(--fg); font-weight: 700; font-size: 18px; }
+.photo-btn { margin-top: 0; padding: 5px 12px; font-size: 13px; cursor: pointer; }

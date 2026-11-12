@@ -1,35 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap');
 
-/* ברירת מחדל: בהיר, לבן עם מלל שחור. אדום לדברים חשובים בלבד. */
+/* עיצוב: Modern Soft CRM. רקע תכלת פסטלי, כרטיסים לבנים, כחול עמוק לפעולות ראשיות.
+   אדום וכתום לאזהרות וסטטוסים בלבד. שמות המשתנים נשארו כדי שכל המסכים ימשיכו לעבוד. */
 :root {
-  --bg: #ffffff;
-  --fg: #000000;
-  --muted: #555555;
+  --bg: #eef5fb;              /* תכלת פסטלי בהיר מאוד */
+  --fg: #1b2a3a;
+  --muted: #5b6b7c;
   --card: #ffffff;
-  --line: #d9d9d9;
-  --accent: #000000;          /* כפתור ראשי ופריטים פעילים */
+  --line: #e2e9f1;            /* אפור-כחלחל בהיר להפרדות */
+  --accent: #1f4e8c;          /* כחול עמוק: כפתור ראשי ופריטים פעילים */
   --accent-fg: #ffffff;
-  --accent-soft: #f2f2f2;
-  --danger: #c62828;          /* חשוב בלבד */
+  --accent-soft: #e8f1fb;
+  --sage: #6f9a86;            /* ירוק מרווה עדין */
+  --sage-soft: #e6f0eb;
+  --sky: #d9ecf8;             /* תכלת פסטלי */
+  --peach: #fbe6d9;           /* אפרסק בהיר */
+  --lavender: #ebe6f7;        /* לבנדר עדין */
+  --danger: #c62828;          /* התראות בלבד */
   --danger-soft: #fdecec;
-  --ok: #1b5e20;
-  --radius: 12px;
-  --shadow: 0 1px 2px rgba(0,0,0,.06);
+  --ok: #2e6b4f;
+  --radius: 16px;
+  --shadow: 0 2px 10px rgba(31, 78, 140, .06);
   --space: 16px;
 }
+/* מצב כהה: אותן משפחות צבעים, מוחשכות */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1620; --fg: #e8eef5; --muted: #9aa8b8; --card: #17212d; --line: #26344a;
+    --accent: #8ab4f8; --accent-fg: #0f1620; --accent-soft: #1d2a3d;
+    --sage: #8fbfa8; --sage-soft: #1d2e27; --sky: #1d2d3d; --peach: #33261e; --lavender: #262238;
+    --danger: #ff6b6b; --danger-soft: #3a1717; --ok: #7fd29f; --shadow: none;
+  }
+}
 :root[data-theme="dark"] {
-  --bg: #0d0d0d;
-  --fg: #ffffff;
-  --muted: #b3b3b3;
-  --card: #1a1a1a;
-  --line: #333333;
-  --accent: #ffffff;
-  --accent-fg: #000000;
-  --accent-soft: #262626;
-  --danger: #ff6b6b;
-  --danger-soft: #3a1717;
-  --ok: #7fd29f;
-  --shadow: none;
+  --bg: #0f1620; --fg: #e8eef5; --muted: #9aa8b8; --card: #17212d; --line: #26344a;
+  --accent: #8ab4f8; --accent-fg: #0f1620; --accent-soft: #1d2a3d;
+  --sage: #8fbfa8; --sage-soft: #1d2e27; --sky: #1d2d3d; --peach: #33261e; --lavender: #262238;
+  --danger: #ff6b6b; --danger-soft: #3a1717; --ok: #7fd29f; --shadow: none;
 }
 
 * { box-sizing: border-box; }
@@ -175,4 +182,31 @@ button.big { padding: 18px; font-size: 18px; margin-top: 0; }
   .cal-week { grid-template-columns: 1fr; }
   .cal-nav input[type="date"] { width: 150px; }
   .cal-hour { grid-template-columns: 60px 1fr; }
+}
+
+/* ===== מעטפת הניהול: סרגל צד מתקפל, סרגל עליון ===== */
+.app { grid-template-columns: 240px 1fr; }
+.app.sidebar-collapsed { grid-template-columns: 72px 1fr; }
+.app.sidebar-collapsed .navlink { justify-content: center; padding: 10px 0; }
+.app.sidebar-collapsed .navgroup-title { display: none; }
+.sidebar { background: var(--card); border-inline-end: 1px solid var(--line); padding: 18px 12px; display: flex; flex-direction: column; overflow-y: auto; }
+.brand-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 6px 16px; }
+.collapse-btn { margin-top: 0; padding: 4px 10px; font-size: 18px; color: var(--muted); }
+.navgroup { display: flex; flex-direction: column; gap: 3px; margin-bottom: 14px; }
+.navgroup-title { font-size: 12px; color: var(--muted); padding: 0 12px 4px; font-weight: 600; }
+.navlink.active { background: var(--accent-soft); color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.content { min-width: 0; display: flex; flex-direction: column; }
+.topbar { display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: var(--bg); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 4; flex-wrap: wrap; }
+.topsearch { flex: 1 1 260px; max-width: 420px; }
+.topsearch input { margin-top: 0; background: var(--card); border-radius: 999px; padding: 9px 16px; }
+.primary-create { margin-top: 0; padding: 10px 18px; border-radius: 999px; font-size: 15px; }
+.bell { position: relative; text-decoration: none; padding: 8px 10px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); color: var(--fg); }
+.badge-count { display: inline-block; min-width: 20px; padding: 0 6px; margin-inline-start: 4px; border-radius: 999px; background: var(--danger); color: #fff; font-size: 12px; font-weight: 700; text-align: center; }
+.userchip { font-size: 13px; color: var(--muted); max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.main { padding: 24px; }
+@media (max-width: 820px) {
+  .app, .app.sidebar-collapsed { grid-template-columns: 1fr; }
+  .topbar { padding: 10px 14px; }
+  .userchip { display: none; }
+  .topsearch { flex: 1 1 100%; max-width: none; order: 3; }
 }

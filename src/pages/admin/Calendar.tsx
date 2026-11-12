@@ -7,7 +7,7 @@ import {
   addMinutesToTime, hhmm, minutesOf, monthGrid, parseLocalISO, rangeFor, sameDay, shift, toLocalISO, viewTitle, weekDays,
 } from '../../lib/calendar';
 
-type Named = { id: string; name: string; color: string; default_minutes?: number | null };
+export type Named = { id: string; name: string; color: string; default_minutes?: number | null };
 
 type Lecture = {
   id: string;
@@ -340,7 +340,7 @@ function LectureDetail({ lecture: r, onClose, onChanged, onEdit }: {
 
 // יצירה ועריכה של הרצאה מהלוח. בעריכה (lecture) הטופס מתמלא מההרצאה ומעדכן את אותה שורה.
 // ביצירה מעודכן שלב בית הספר; בעריכה לא, כי השלב כבר נקבע.
-function NewLecture({ date, start, lecture, lecturers, types, onClose, onSaved }: {
+export function NewLecture({ date, start, lecture, lecturers, types, onClose, onSaved }: {
   date: string;
   start?: string;
   lecture?: Lecture | null;

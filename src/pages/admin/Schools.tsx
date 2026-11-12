@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { CHANNELS, ORG_TYPES, STAGES, STAGE_LABELS } from '../../lib/labels';
 
@@ -24,7 +24,9 @@ export default function Schools() {
   const [rows, setRows] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [q, setQ] = useState('');
+  // החיפוש מהסרגל העליון מגיע כ-?q= בכתובת
+  const [searchParams] = useSearchParams();
+  const [q, setQ] = useState(searchParams.get('q') ?? '');
   const [letter, setLetter] = useState('');
   const [stages, setStages] = useState<string[]>([]);
   const [limit, setLimit] = useState(PAGE);

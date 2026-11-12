@@ -3,7 +3,7 @@
 /* עיצוב: Modern Soft CRM. רקע תכלת פסטלי, כרטיסים לבנים, כחול עמוק לפעולות ראשיות.
    אדום וכתום לאזהרות וסטטוסים בלבד. שמות המשתנים נשארו כדי שכל המסכים ימשיכו לעבוד. */
 :root {
-  --bg: #eef8f1;              /* ירוק-נענע בהיר מאוד */
+  --bg: #e6f5f2;              /* תכלת-ירוק פסטלי בהיר, כמו ברפרנס */
   --fg: #1b2e24;
   --muted: #5a6f63;
   --card: #ffffff;
@@ -13,9 +13,9 @@
   --accent-soft: #e3f4ea;
   --sage: #7fbf9c;            /* ירוק בהיר */
   --sage-soft: #e3f4ea;
-  --sky: #d9ecf8;             /* תכלת פסטלי */
-  --peach: #fbe6d9;           /* אפרסק בהיר */
-  --lavender: #ebe6f7;        /* לבנדר עדין */
+  --sky: #d9f1f0;             /* תכלת פסטלי */
+  --peach: #fde8dc;           /* אפרסק בהיר */
+  --lavender: #e9e6fb;        /* לבנדר עדין */
   --danger: #c62828;          /* התראות בלבד */
   --danger-soft: #fdecec;
   --ok: #2e6b4f;
@@ -221,9 +221,9 @@ ul.plain { list-style: none; padding: 0; margin: 0; display: flex; flex-directio
 ul.plain li { padding: 8px 10px; background: var(--accent-soft); border-radius: 10px; font-size: 14px; }
 .small { font-size: 12px; }
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
-.kpi-card { display: flex; flex-direction: column; gap: 4px; padding: 16px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); text-decoration: none; color: var(--fg); border-inline-start: 4px solid var(--accent); transition: transform .12s ease; }
-.kpi-card:nth-child(3n+2) { border-inline-start-color: var(--sage); }
-.kpi-card:nth-child(3n) { border-inline-start-color: var(--peach); }
+.kpi-card { display: flex; flex-direction: column; gap: 4px; padding: 16px; background: var(--sage-soft); border-radius: var(--radius); box-shadow: var(--shadow); text-decoration: none; color: var(--fg); transition: transform .12s ease; }
+.kpi-card:nth-child(3n+2) { background: var(--peach); }
+.kpi-card:nth-child(3n) { background: var(--sky); }
 .kpi-card:hover { transform: translateY(-2px); }
 .kpi-value { font-size: 28px; font-weight: 700; }
 .kpi-label { font-size: 13px; color: var(--muted); }

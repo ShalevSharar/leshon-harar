@@ -260,3 +260,6 @@ table.pretty .nowrap { white-space: nowrap; }
 }
 .question-legend { margin: 8px 0 0; padding-inline-start: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
 .question-legend li { padding: 6px 10px; background: var(--accent-soft); border-radius: 10px; }
+.q-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.q-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+.q-card p { margin: 0 0 6px; font-size: 14px; }

@@ -96,15 +96,12 @@ function TypeSection({ typeName, lectures, responses, questions }: {
     return { q, avg, n: vals.length };
   });
 
-  // התפלגות התשובות 1-5 לכל שאלת סולם: גרף עמודות מוערם לפי שאלה
-  const distSeries = [1, 2, 3, 4, 5].map((score, idx) => ({
-    name: `${score}`,
-    color: ['var(--danger)', 'var(--peach)', 'var(--sky)', 'var(--sage)', 'var(--accent)'][idx],
-    values: scaleQs.map((q) =>
-      responses.filter((r) => r.audience === q.audience && r.answers[q.id] === score).length,
-    ),
-  }));
   const avgLabels = rows.map((_, i) => `ש${i + 1}`);
+  // כמה ענו 1,2,3,4,5 בכל שאלה
+  const countsFor = (q: Question) =>
+    [1, 2, 3, 4, 5].map((score) =>
+      responses.filter((r) => r.audience === q.audience && r.answers[q.id] === score).length,
+    );
 
   const weak = rows.filter((x) => x.avg !== null && x.avg < 3.5);
   const improveQs = openQs.filter((q) => q.text.includes('לשפר'));
@@ -142,13 +139,15 @@ function TypeSection({ typeName, lectures, responses, questions }: {
         labels={avgLabels}
         series={[{ name: 'ממוצע', color: 'var(--accent)', values: rows.map((x) => x.avg ?? 0) }]}
       />
-      <h3>התפלגות התשובות</h3>
-      <BarChart labels={avgLabels} series={distSeries} />
-      <ol className="question-legend">
+      <h3>כמה ענו 1 עד 5 בכל שאלה</h3>
+      <div className="q-charts">
         {rows.map((x, i) => (
-          <li key={x.q.id}><strong>ש{i + 1}.</strong> {x.q.text}</li>
+          <div key={x.q.id} className="q-card">
+            <p><strong>ש{i + 1}.</strong> {x.q.text}</p>
+            <BarChart labels={['1', '2', '3', '4', '5']} series={[{ name: 'תשובות', color: 'var(--accent)', values: countsFor(x.q) }]} height={170} />
+          </div>
         ))}
-      </ol>
+      </div>
       <div className="table-wrap">
         <table>
           <thead><tr><th>שאלה</th><th>קהל</th><th>ממוצע</th><th>תשובות</th></tr></thead>

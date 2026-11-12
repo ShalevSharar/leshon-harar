@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import BarChart from '../../components/charts/BarChart';
 
 type Question = { id: string; audience: 'student' | 'teacher'; position: number; text: string; type: 'scale' | 'open' };
 type Response = { audience: 'student' | 'teacher'; answers: Record<string, number | string>; created_at: string };
@@ -88,6 +89,19 @@ export default function LectureResults() {
           </div>
         );
       })}
+
+      <h2>כמה ענו 1 עד 5 בכל שאלה</h2>
+      <div className="q-charts">
+        {scaleQs.map((q, i) => {
+          const counts = [1, 2, 3, 4, 5].map((score) => responses.filter((r) => r.answers[q.id] === score).length);
+          return (
+            <div key={q.id} className="q-card">
+              <p><strong>ש{i + 1}.</strong> {q.text}</p>
+              <BarChart labels={['1', '2', '3', '4', '5']} series={[{ name: 'תשובות', color: 'var(--accent)', values: counts }]} height={170} />
+            </div>
+          );
+        })}
+      </div>
 
       <h2>תשובות פתוחות</h2>
       {questions.filter((q) => q.type === 'open').map((q) => {

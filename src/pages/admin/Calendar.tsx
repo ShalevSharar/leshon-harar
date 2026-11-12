@@ -324,7 +324,7 @@ function LectureDetail({ lecture: r, onClose, onChanged, onEdit }: {
         {error && <p className="err" role="alert">{error}</p>}
         <div className="toolbar">
           <Link to={`/admin/schools/${r.school_id}`}>כרטיס בית ספר</Link>
-          <Link to={`/admin/lectures/${r.id}`}>תוצאות סקר</Link>
+          <Link className="btn-soft" to={`/admin/lectures/${r.id}`}>📊 תוצאות סקר</Link>
         </div>
         <div className="toolbar">
           <button type="button" className="secondary" onClick={onClose}>סגירה</button>

@@ -196,7 +196,7 @@ export default function Lectures() {
                     <button type="button" className="secondary" onClick={() => setQrFor(qrFor === l.survey_token ? null : l.survey_token)}>
                       QR לסקר
                     </button>
-                    <Link to={`/admin/lectures/${l.id}`}>תוצאות</Link>
+                    <Link className="btn-soft" to={`/admin/lectures/${l.id}`}>📊 תוצאות</Link>
                     <button
                       type="button"
                       className="secondary"

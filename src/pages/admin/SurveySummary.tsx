@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { supabase, NO_DB_MESSAGE } from '../../lib/supabase';
+import BarChart from '../../components/charts/BarChart';
 
 type Question = { id: string; audience: 'student' | 'teacher'; position: number; text: string; type: 'scale' | 'open' };
 type Lecture = { id: string; lecture_date: string | null; lecture_type_id: string | null; schools: { name: string } | null; lecture_types: { name: string } | null };
@@ -95,6 +96,16 @@ function TypeSection({ typeName, lectures, responses, questions }: {
     return { q, avg, n: vals.length };
   });
 
+  // התפלגות התשובות 1-5 לכל שאלת סולם: גרף עמודות מוערם לפי שאלה
+  const distSeries = [1, 2, 3, 4, 5].map((score, idx) => ({
+    name: `${score}`,
+    color: ['var(--danger)', 'var(--peach)', 'var(--sky)', 'var(--sage)', 'var(--accent)'][idx],
+    values: scaleQs.map((q) =>
+      responses.filter((r) => r.audience === q.audience && r.answers[q.id] === score).length,
+    ),
+  }));
+  const avgLabels = rows.map((_, i) => `ש${i + 1}`);
+
   const weak = rows.filter((x) => x.avg !== null && x.avg < 3.5);
   const improveQs = openQs.filter((q) => q.text.includes('לשפר'));
   const improveTexts = improveQs.flatMap((q) =>
@@ -127,6 +138,17 @@ function TypeSection({ typeName, lectures, responses, questions }: {
       )}
 
       <h3>ממוצעים (מתוך 5)</h3>
+      <BarChart
+        labels={avgLabels}
+        series={[{ name: 'ממוצע', color: 'var(--accent)', values: rows.map((x) => x.avg ?? 0) }]}
+      />
+      <h3>התפלגות התשובות</h3>
+      <BarChart labels={avgLabels} series={distSeries} />
+      <ol className="question-legend">
+        {rows.map((x, i) => (
+          <li key={x.q.id}><strong>ש{i + 1}.</strong> {x.q.text}</li>
+        ))}
+      </ol>
       <div className="table-wrap">
         <table>
           <thead><tr><th>שאלה</th><th>קהל</th><th>ממוצע</th><th>תשובות</th></tr></thead>

@@ -177,7 +177,7 @@ export default function Schools() {
       {error && <p className="err" role="alert">{error}</p>}
       {loading ? <p>טוען...</p> : (
         <div className="table-wrap">
-          <table>
+          <table className="pretty">
             <thead>
               <tr><th>שם</th><th>סוג</th><th>עיר</th><th>טלפון</th><th>שלב חינוך</th><th>שלב בתהליך</th><th>מעקב הבא</th><th>אחראי</th><th></th></tr>
             </thead>
@@ -186,9 +186,11 @@ export default function Schools() {
               {rows.map((s) => (
                 <tr key={s.id}>
                   <td><Link to={`/admin/schools/${s.id}`}>{s.name}</Link>{s.is_sample && <span className="tag"> דוגמה</span>}</td>
-                  <td data-label="סוג">{s.org_type}</td>
+                  <td data-label="סוג">
+                    <span className={`pill ${s.org_type === 'מתנסים' ? 'org-camp' : s.org_type === 'בית ספר' ? '' : 'org-other'}`}>{s.org_type}</span>
+                  </td>
                   <td data-label="עיר">{s.city}</td>
-                  <td data-label="טלפון"><a href={`tel:${s.phone}`}>{s.phone}</a></td>
+                  <td data-label="טלפון" className="nowrap">{s.phone ? <a href={`tel:${s.phone}`}>{s.phone}</a> : ''}</td>
                   <td data-label="רמה">{s.level}</td>
                   <td data-label="שלב"><span className={`stage s-${s.stage}`}>{STAGE_LABELS[s.stage] ?? s.stage}</span></td>
                   <td data-label="מעקב">{s.next_followup_at ?? ''}</td>

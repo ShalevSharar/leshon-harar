@@ -101,6 +101,10 @@ export default function Lectures() {
 
   async function copySurvey(token: string) {
     const url = `${window.location.origin}/survey/${token}`;
+    // על localhost הקישור עובד רק על המחשב הזה. לשליחה לבתי הספר יש להעתיק מהאתר החי.
+    if (window.location.hostname === 'localhost') {
+      setError('שימו לב: הקישור הזה עובד רק על המחשב הזה. להעתקה לשליחה, פתחו את המערכת מ-https://leshon-harar.vercel.app/admin');
+    }
     try {
       await navigator.clipboard.writeText(url);
       setCopied(token);

@@ -8,6 +8,7 @@ const ITEMS = [
   { to: '/admin/calendar', label: 'לוח שנה', icon: '▤' },
   { to: '/admin/lectures', label: 'הרצאות', icon: '✎' },
   { to: '/admin/lecture-settings', label: 'מרצים', icon: '☰' },
+  { to: '/admin/users', label: 'משתמשים', icon: '☺' },
   { to: '/admin/requests', label: 'בקשות', icon: '✉' },
   { to: '/admin/volunteers', label: 'מתנדבים', icon: '♥' },
 ];

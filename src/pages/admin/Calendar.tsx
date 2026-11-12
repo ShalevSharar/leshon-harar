@@ -39,6 +39,7 @@ export default function Calendar() {
   const [typeFilter, setTypeFilter] = useState('');
   const [selected, setSelected] = useState<Lecture | null>(null);
   const [slot, setSlot] = useState<{ date: string; start?: string } | null>(null);
+  const [editing, setEditing] = useState<Lecture | null>(null);
   const [error, setError] = useState('');
 
   const load = useCallback(async () => {
@@ -194,6 +195,18 @@ export default function Calendar() {
           lecture={selected}
           onClose={() => setSelected(null)}
           onChanged={() => { setSelected(null); load(); }}
+          onEdit={() => { setEditing(selected); setSelected(null); }}
+        />
+      )}
+
+      {editing && (
+        <NewLecture
+          date={editing.lecture_date ?? toLocalISO(anchor)}
+          lecture={editing}
+          lecturers={lecturers}
+          types={types}
+          onClose={() => setEditing(null)}
+          onSaved={() => { setEditing(null); load(); }}
         />
       )}
 
@@ -266,10 +279,11 @@ function DayList({ items, onOpen, onAdd }: {
 }
 
 // פרטי הרצאה, שינוי סטטוס ומעבר לכרטיס בית הספר
-function LectureDetail({ lecture: r, onClose, onChanged }: {
+function LectureDetail({ lecture: r, onClose, onChanged, onEdit }: {
   lecture: Lecture;
   onClose: () => void;
   onChanged: () => void;
+  onEdit: () => void;
 }) {
   const [error, setError] = useState('');
 
@@ -314,6 +328,7 @@ function LectureDetail({ lecture: r, onClose, onChanged }: {
         </div>
         <div className="toolbar">
           <button type="button" className="secondary" onClick={onClose}>סגירה</button>
+          <button type="button" className="secondary" onClick={onEdit}>עריכה</button>
           <button type="button" className="secondary" style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }} onClick={removeLecture}>
             מחיקת הרצאה
           </button>
@@ -323,21 +338,32 @@ function LectureDetail({ lecture: r, onClose, onChanged }: {
   );
 }
 
-// יצירת הרצאה מהלוח. אותה לוגיקה כמו בדף ההרצאות: עדכון שלב בית הספר.
-function NewLecture({ date, start, lecturers, types, onClose, onSaved }: {
+// יצירה ועריכה של הרצאה מהלוח. בעריכה (lecture) הטופס מתמלא מההרצאה ומעדכן את אותה שורה.
+// ביצירה מעודכן שלב בית הספר; בעריכה לא, כי השלב כבר נקבע.
+function NewLecture({ date, start, lecture, lecturers, types, onClose, onSaved }: {
   date: string;
   start?: string;
+  lecture?: Lecture | null;
   lecturers: Named[];
   types: Named[];
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [school, setSchool] = useState<PickedSchool | null>(null);
+  const editing = Boolean(lecture);
+  const [school, setSchool] = useState<PickedSchool | null>(
+    lecture ? { id: lecture.school_id, name: lecture.schools?.name ?? '', city: lecture.schools?.city ?? '' } : null,
+  );
   const [error, setError] = useState('');
-  const [typeId, setTypeId] = useState('');
+  const [typeId, setTypeId] = useState(lecture?.lecture_type_id ?? '');
   const minutes = types.find((t) => t.id === typeId)?.default_minutes ?? null;
-  const [startTime, setStartTime] = useState(start ?? DEFAULT_START);
-  const [endTime, setEndTime] = useState(start ? `${String(Number(start.slice(0, 2)) + 1).padStart(2, '0')}:00` : DEFAULT_END);
+  const [startTime, setStartTime] = useState(
+    lecture ? hhmm(lecture.start_time, DEFAULT_START) : start ?? DEFAULT_START,
+  );
+  const [endTime, setEndTime] = useState(
+    lecture
+      ? hhmm(lecture.end_time, DEFAULT_END)
+      : start ? `${String(Number(start.slice(0, 2)) + 1).padStart(2, '0')}:00` : DEFAULT_END,
+  );
 
   async function save(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -346,7 +372,7 @@ function NewLecture({ date, start, lecturers, types, onClose, onSaved }: {
     if (endTime <= startTime) return setError('שעת הסיום חייבת להיות אחרי שעת ההתחלה.');
     const f = new FormData(e.currentTarget);
     const est = String(f.get('est_students') ?? '').trim();
-    const { error: err } = await supabase.from('lectures').insert({
+    const row = {
       school_id: school.id,
       lecture_date: String(f.get('lecture_date') ?? '') || null,
       start_time: startTime,
@@ -355,7 +381,13 @@ function NewLecture({ date, start, lecturers, types, onClose, onSaved }: {
       lecture_type_id: String(f.get('lecture_type_id') ?? '') || null,
       grade: String(f.get('grade') ?? '').trim(),
       est_students: est ? Number(est) : null,
-    });
+    };
+    if (lecture) {
+      const { error: err } = await supabase.from('lectures').update(row).eq('id', lecture.id);
+      if (err) return setError('עדכון ההרצאה נכשל.');
+      return onSaved();
+    }
+    const { error: err } = await supabase.from('lectures').insert(row);
     if (err) return setError('שמירת ההרצאה נכשלה.');
     await supabase.from('schools').update({ stage: 'lecture_scheduled' }).eq('id', school.id);
     onSaved();
@@ -363,12 +395,12 @@ function NewLecture({ date, start, lecturers, types, onClose, onSaved }: {
 
   return (
     <div className="overlay" onClick={onClose}>
-      <form className="card quick" role="dialog" aria-label="הרצאה חדשה" onClick={(e) => e.stopPropagation()} onSubmit={save}>
-        <h2>הרצאה חדשה</h2>
+      <form className="card quick" role="dialog" aria-label={editing ? 'עריכת הרצאה' : 'הרצאה חדשה'} onClick={(e) => e.stopPropagation()} onSubmit={save}>
+        <h2>{editing ? 'עריכת הרצאה' : 'הרצאה חדשה'}</h2>
         <SchoolPicker value={school} onChange={setSchool} />
         <label>
           תאריך
-          <input name="lecture_date" type="date" defaultValue={date} required />
+          <input name="lecture_date" type="date" defaultValue={lecture?.lecture_date ?? date} required />
         </label>
         <div className="checks">
           <label>
@@ -390,7 +422,7 @@ function NewLecture({ date, start, lecturers, types, onClose, onSaved }: {
         </div>
         <label>
           מרצה
-          <select name="lecturer_id" defaultValue="">
+          <select name="lecturer_id" defaultValue={lecture?.lecturer_id ?? ''}>
             <option value="">ללא מרצה</option>
             {lecturers.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
           </select>
@@ -414,11 +446,11 @@ function NewLecture({ date, start, lecturers, types, onClose, onSaved }: {
         </label>
         <label>
           שכבה
-          <input name="grade" />
+          <input name="grade" defaultValue={lecture?.grade ?? ''} />
         </label>
         <label>
           מספר תלמידים
-          <input name="est_students" type="number" min={0} />
+          <input name="est_students" type="number" min={0} defaultValue={lecture?.est_students ?? ''} />
         </label>
         {error && <p className="err" role="alert">{error}</p>}
         <button type="submit">שמירה</button>

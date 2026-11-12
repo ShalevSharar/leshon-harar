@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
-export type PickedSchool = { id: string; name: string; city: string };
+export type PickedSchool = { id: string; name: string; city: string; org_type?: string };
 
 // בחירת בית ספר בחיפוש חופשי (שם, עיר או סמל מוסד). לא רשימה נגללת, כי יש אלפי בתי ספר.
 export default function SchoolPicker({
@@ -26,7 +26,7 @@ export default function SchoolPicker({
       const esc = t.replace(/[%,()]/g, ' ');
       const { data } = await supabase!
         .from('schools')
-        .select('id,name,city')
+        .select('id,name,city,org_type')
         .or(`name.ilike.%${esc}%,city.ilike.%${esc}%,symbol_code.eq.${esc}`)
         .order('name')
         .limit(10);
@@ -61,7 +61,7 @@ export default function SchoolPicker({
           {results.map((s) => (
             <li key={s.id}>
               <button type="button" className="secondary" onClick={() => onChange(s)}>
-                {s.name} ({s.city})
+                {s.name} ({s.city}){s.org_type && s.org_type !== 'בית ספר' ? ` · ${s.org_type}` : ''}
               </button>
             </li>
           ))}

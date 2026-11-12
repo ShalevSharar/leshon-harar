@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { CHANNELS, STAGES, STAGE_LABELS } from '../../lib/labels';
+import { CHANNELS, ORG_TYPES, STAGES, STAGE_LABELS } from '../../lib/labels';
 
 type School = {
   id: string;
@@ -10,6 +10,7 @@ type School = {
   level: string;
   phone: string;
   stage: string;
+  org_type: string;
   next_followup_at: string | null;
   is_sample: boolean;
 };
@@ -29,15 +30,18 @@ export default function Schools() {
   const [limit, setLimit] = useState(PAGE);
   const [reload, setReload] = useState(0);
   const [quick, setQuick] = useState<School | null>(null);
+  const [orgType, setOrgType] = useState('');
+  const [showNew, setShowNew] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
     setLoading(true);
     let query = supabase
       .from('schools')
-      .select('id,name,city,level,phone,stage,next_followup_at,is_sample')
+      .select('id,name,city,level,phone,stage,org_type,next_followup_at,is_sample')
       .order('name')
       .limit(limit);
+    if (orgType) query = query.eq('org_type', orgType);
     if (letter) query = query.ilike('name', `${letter}%`);
     if (stages.length) query = query.in('stage', stages);
     const term = q.trim();
@@ -47,7 +51,7 @@ export default function Schools() {
       else setRows((data ?? []) as School[]);
       setLoading(false);
     });
-  }, [q, letter, stages, limit, reload]);
+  }, [q, letter, stages, limit, reload, orgType]);
 
   function toggleStage(s: string) {
     setLimit(PAGE);
@@ -67,7 +71,25 @@ export default function Schools() {
           aria-label="חיפוש"
           style={{ width: 280 }}
         />
+        <select
+          value={orgType}
+          onChange={(e) => { setLimit(PAGE); setOrgType(e.target.value); }}
+          aria-label="סינון לפי סוג מוסד"
+        >
+          <option value="">כל הסוגים</option>
+          {ORG_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
+        <button type="button" onClick={() => setShowNew((v) => !v)}>
+          {showNew ? 'ביטול' : 'מוסד חדש'}
+        </button>
       </div>
+
+      {showNew && (
+        <NewOrganization
+          onClose={() => setShowNew(false)}
+          onSaved={() => { setShowNew(false); setReload((n) => n + 1); }}
+        />
+      )}
 
       <div className="letters" role="group" aria-label="סינון לפי אות ראשונה">
         <button type="button" className={letter === '' ? 'chip on' : 'chip'} onClick={() => { setLimit(PAGE); setLetter(''); }}>הכול</button>
@@ -90,12 +112,14 @@ export default function Schools() {
         <div className="table-wrap">
           <table>
             <thead>
-              <tr><th>שם</th><th>עיר</th><th>טלפון</th><th>שלב חינוך</th><th>שלב בתהליך</th><th>מעקב הבא</th><th></th></tr>
+              <tr><th>שם</th><th>סוג</th><th>עיר</th><th>טלפון</th><th>שלב חינוך</th><th>שלב בתהליך</th><th>מעקב הבא</th><th></th></tr>
             </thead>
             <tbody>
+              {/* ראו NewOrganization למטה: רשומה חדשה נשמרת עם סוג מוסד וללא סמל משרד החינוך */}
               {rows.map((s) => (
                 <tr key={s.id}>
                   <td><Link to={`/admin/schools/${s.id}`}>{s.name}</Link>{s.is_sample && <span className="tag"> דוגמה</span>}</td>
+                  <td data-label="סוג">{s.org_type}</td>
                   <td data-label="עיר">{s.city}</td>
                   <td data-label="טלפון"><a href={`tel:${s.phone}`}>{s.phone}</a></td>
                   <td data-label="רמה">{s.level}</td>
@@ -121,6 +145,56 @@ export default function Schools() {
         />
       )}
     </div>
+  );
+}
+
+// טופס להוספת מוסד חדש: בית ספר, מתנסים, חברתון או ארגון אחר.
+// נשמר עם manual = true כדי להבדיל מרשומות שיובאו ממשרד החינוך.
+function NewOrganization({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!supabase) return setError('אין חיבור לשרת הנתונים.');
+    // שומרים את הטופס לפני ה-await: אחרי await, e.currentTarget כבר null
+    const form = e.currentTarget;
+    const f = new FormData(form);
+    const name = String(f.get('name') ?? '').trim();
+    if (name.length < 2) return setError('יש להזין שם (לפחות 2 תווים).');
+    setBusy(true);
+    const { error: err } = await supabase.from('schools').insert({
+      name,
+      org_type: String(f.get('org_type') ?? 'ארגון אחר'),
+      city: String(f.get('city') ?? '').trim(),
+      phone: String(f.get('phone') ?? '').trim(),
+      address: String(f.get('address') ?? '').trim(),
+      manual: true,
+    });
+    setBusy(false);
+    if (err) return setError('השמירה נכשלה. ייתכן שהשם כבר קיים או שהנתונים לא תקינים.');
+    form.reset();
+    onSaved();
+  }
+
+  return (
+    <form className="card" onSubmit={onSubmit} style={{ marginBottom: 16 }}>
+      <h2>מוסד חדש</h2>
+      <div className="toolbar">
+        <input name="name" placeholder="שם המוסד" required minLength={2} aria-label="שם המוסד" />
+        <select name="org_type" defaultValue="מתנסים" aria-label="סוג המוסד">
+          {ORG_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
+        <input name="city" placeholder="עיר" aria-label="עיר" />
+        <input name="phone" type="tel" placeholder="טלפון" aria-label="טלפון" />
+        <input name="address" placeholder="כתובת" aria-label="כתובת" />
+      </div>
+      {error && <p className="err" role="alert">{error}</p>}
+      <div className="toolbar">
+        <button type="submit" disabled={busy}>{busy ? 'שומר...' : 'שמירה'}</button>
+        <button type="button" className="secondary" onClick={onClose}>ביטול</button>
+      </div>
+    </form>
   );
 }
 

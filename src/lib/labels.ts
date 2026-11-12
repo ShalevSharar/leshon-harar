@@ -13,6 +13,9 @@ export const STAGES = Object.keys(STAGE_LABELS);
 
 export const CHANNELS = ['טלפון', 'מייל', 'ווטסאפ', 'דף נחיתה', 'אחר'];
 
+// סוגי מוסדות. "בית ספר" הוא ברירת המחדל, וכל השאר הם ארגונים נוספים שאפשר להוסיף.
+export const ORG_TYPES = ['בית ספר', 'מתנסים', 'חברתון', 'ארגון אחר'] as const;
+
 export const REQUEST_STATUS_LABELS: Record<string, string> = {
   pending: 'ממתין',
   matched: 'שויך לבית ספר',
